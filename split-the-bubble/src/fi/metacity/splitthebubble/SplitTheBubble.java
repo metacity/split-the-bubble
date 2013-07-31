@@ -62,16 +62,40 @@ public class SplitTheBubble implements ApplicationListener {
 		Iterator<Bubble> iter = mBubbles.iterator();
 		while (iter.hasNext()) {
 			Bubble bubble = iter.next();
-			final float deltaX = bubble.xDirection * 200 * Gdx.graphics.getDeltaTime();
-			final float deltaY = bubble.yDirection * 200 * Gdx.graphics.getDeltaTime();
+			
+			// Apply air resistance to X
+			bubble.xSpeed *= 0.999;
+			
+			// Apply gravity to Y
+			bubble.ySpeed -= (4 * Gdx.graphics.getDeltaTime());
+			
+			// Move the bubble
+			final float deltaX = bubble.xSpeed * 200 * Gdx.graphics.getDeltaTime();
+			final float deltaY = bubble.ySpeed * 200 * Gdx.graphics.getDeltaTime();
 			bubble.setPosition(bubble.getX() + deltaX, bubble.getY() + deltaY);
-			if (bubble.getX() > 800 - bubble.getWidth() || bubble.getX() < 0) {
+			
+			
+			// Bounce from screen edges
+			if (bubble.getX() > 800 - bubble.getWidth()) {
+				bubble.setPosition(800 - bubble.getWidth(), bubble.getY());
 				bubble.flipXDirection();
 			}
-			if (bubble.getY() > 480 - bubble.getHeight() || bubble.getY() < 0) {
+			if (bubble.getX() < 0) {
+				bubble.setPosition(0, bubble.getY());
+				bubble.flipXDirection();
+			}
+			if (bubble.getY() > 480 - bubble.getHeight()) {
+				bubble.setPosition(bubble.getX(), 480 - bubble.getHeight());
+				bubble.flipYDirection();
+				bubble.ySpeed *= 0.98; // And lose some momentum
+			}
+			if (bubble.getY() < 0) {
+				bubble.setPosition(bubble.getX(), 0);
 				bubble.flipYDirection();
 			}
 			
+			
+			// Split when touched
 			if (Gdx.input.isTouched()) {
 				mTouchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 				mCamera.unproject(mTouchPos);
@@ -91,7 +115,7 @@ public class SplitTheBubble implements ApplicationListener {
 		}
 		
 		if (TimeUtils.nanoTime() - mLastBubbleSpawnTime > 5000000000L) {
-			spawnBubble(Bubble.Type.BIG, (float)Math.random()*(800-130), (float)Math.random()*(480-130));
+			spawnBubble(Bubble.Type.BIG, (float)Math.random()*(400), (float)Math.random()*(300));
 		}
 		
 	}
