@@ -10,27 +10,23 @@ public class Bubble extends Sprite {
 	private static Texture sBubbleMed;
 	private static Texture sBubbleSmall;
 
-	public int yDirection = 1;
-	public int xDirection = 1;
+	public float ySpeed = 2.5f;
+	public float xSpeed;
 	public Bubble.Type type;
 	
 	private Bubble(Texture texture, Bubble.Type type) {
 		super(texture);
 		this.type = type;
 		
-		int xRnd = (int)(Math.random() * 100);
-		if (xRnd > 50) flipXDirection();
-		
-		int yRnd = (int)(Math.random() * 100);
-		if (yRnd > 50) flipYDirection();
+		xSpeed = (float)Math.random() * 4 - 2;
 	}
 
 	public void flipYDirection() {
-		yDirection *= -1;
+		ySpeed *= -1;
 	}
 
 	public void flipXDirection() {
-		xDirection *= -1;
+		xSpeed *= -1;
 	}
 	
 	public static Bubble newInstance(Bubble.Type type) {
