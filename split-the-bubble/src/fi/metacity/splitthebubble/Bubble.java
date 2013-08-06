@@ -2,31 +2,44 @@ package fi.metacity.splitthebubble;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
-public class Bubble extends Sprite {
+@SuppressWarnings("serial")
+public class Bubble extends Rectangle {
 	
 	private static Texture sBubbleBig;
 	private static Texture sBubbleMed;
 	private static Texture sBubbleSmall;
 
-	public float ySpeed = 2.5f;
-	public float xSpeed;
-	public Bubble.Type type;
+	
+	private final Texture mTexture;
+	
+	public final Bubble.Type type;
+	public float yVelocity = 2.5f;
+	public float xVelocity;
 	
 	private Bubble(Texture texture, Bubble.Type type) {
-		super(texture);
+		super();
+		mTexture = texture;
 		this.type = type;
 		
-		xSpeed = (float)Math.random() * 4 - 2;
+		width = texture.getWidth();
+		height = texture.getHeight();
+		
+		xVelocity = (float)Math.random() * 4 - 2;
 	}
 
 	public void flipYDirection() {
-		ySpeed *= -1;
+		yVelocity *= -1;
 	}
 
 	public void flipXDirection() {
-		xSpeed *= -1;
+		xVelocity *= -1;
+	}
+	
+	public void draw(SpriteBatch batch) {
+		batch.draw(mTexture, x, y);
 	}
 	
 	public static Bubble newInstance(Bubble.Type type) {

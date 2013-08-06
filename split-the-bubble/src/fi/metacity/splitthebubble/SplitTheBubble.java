@@ -10,51 +10,74 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class SplitTheBubble implements ApplicationListener {
 	
+	private static final int WORLD_WIDTH = 800;
+	private static final int WORLD_HEIGHT = 480;
+	
+	
 	private long mLastBubbleSpawnTime;
 	
-	private OrthographicCamera mCamera;
+	private final OrthographicCamera mCamera = new OrthographicCamera();
 	private SpriteBatch mBatch;
-	private Vector3 mTouchPos;
 	
+	private final Array<Bubble> mBubbles = new Array<Bubble>();
+	private Texture mCharacterTexture;
+	private Rectangle mCharacter;
 	private Sprite mBackground;
-	private Sprite mCharacter;
-	private Array<Bubble> mBubbles;
+	
+	private TextureRegion mRopeRegion;
+	private Rectangle mRope;
+	private boolean mRopeVisible;
 	
 	@Override
 	public void create() {
 		Texture.setEnforcePotImages(false);
+		Gdx.graphics.setVSync(true);
 		
-		mCamera = new OrthographicCamera();
-		mCamera.setToOrtho(false, 800, 480);
-		
+		mCamera.setToOrtho(false, WORLD_WIDTH, WORLD_HEIGHT);
 		mBatch = new SpriteBatch();
-		mTouchPos = new Vector3();
-		mBubbles = new Array<Bubble>();
 		
-		mCharacter = new Sprite(new Texture(Gdx.files.internal("character.png")));
-		mCharacter.setPosition(800/2 - mCharacter.getWidth()/2, 0);  // Center horizontally
+		mCharacterTexture = new Texture(Gdx.files.internal("character.png"));
+		mCharacter = new Rectangle(
+				WORLD_WIDTH/2 - mCharacterTexture.getWidth()/2, // Center horizontally
+				0,
+				mCharacterTexture.getWidth(),
+				mCharacterTexture.getHeight()
+				);
 		
 		mBackground = new Sprite(new Texture(Gdx.files.internal("background.png")));
 		
+		Texture ropeTexture = new Texture(Gdx.files.internal("rope.png"));
+		mRopeRegion = new TextureRegion(ropeTexture, ropeTexture.getWidth(), 0);
+		mRope = new Rectangle(
+				WORLD_WIDTH/2 - ropeTexture.getWidth()/2, // Center horizontally
+				mCharacterTexture.getHeight(),
+				ropeTexture.getWidth(),
+				0
+				);
+		
 		Bubble.loadAssets();
+		
 	}
 
 	@Override
 	public void dispose() {
 		mBatch.dispose();
 		mBackground.getTexture().dispose();
-		mCharacter.getTexture().dispose();
+		mCharacterTexture.dispose();
 		Bubble.dispose();
 	}
 
 	@Override
-	public void render() {		
+	public void render() {
+		final float deltaTime = Gdx.graphics.getDeltaTime();
+		
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
@@ -63,7 +86,8 @@ public class SplitTheBubble implements ApplicationListener {
 		mBatch.setProjectionMatrix(mCamera.combined);
 		mBatch.begin();
 		mBackground.draw(mBatch);
-		mCharacter.draw(mBatch);
+		mBatch.draw(mRopeRegion, mRope.x, mRope.y);
+		mBatch.draw(mCharacterTexture, mCharacter.x, mCharacter.y);
 		for (Bubble bubble : mBubbles) {
 			bubble.draw(mBatch);
 		}
@@ -74,64 +98,79 @@ public class SplitTheBubble implements ApplicationListener {
 			Bubble bubble = iter.next();
 			
 			// Apply air resistance to X
-			bubble.xSpeed *= 0.999;
+			bubble.xVelocity *= 0.999;
 			
 			// Apply gravity to Y
-			bubble.ySpeed -= (4 * Gdx.graphics.getDeltaTime());
+			bubble.yVelocity -= (4 * deltaTime);
 			
 			// Move the bubble
-			final float deltaX = bubble.xSpeed * 200 * Gdx.graphics.getDeltaTime();
-			final float deltaY = bubble.ySpeed * 200 * Gdx.graphics.getDeltaTime();
-			bubble.setPosition(bubble.getX() + deltaX, bubble.getY() + deltaY);
+			final float deltaX = bubble.xVelocity * 200 * deltaTime;
+			final float deltaY = bubble.yVelocity * 200 * deltaTime;
+			bubble.x += deltaX;
+			bubble.y += deltaY;
 			
 			// Bounce from screen edges
-			if (bubble.getX() > 800 - bubble.getWidth()) {
-				bubble.setX(800 - bubble.getWidth());
+			if (bubble.x > WORLD_WIDTH - bubble.width) {
+				bubble.x = WORLD_WIDTH - bubble.width;
 				bubble.flipXDirection();
-			} else if (bubble.getX() < 0) {
-				bubble.setX(0);
+			} else if (bubble.x < 0) {
+				bubble.x = 0;
 				bubble.flipXDirection();
 			}
-			if (bubble.getY() > 480 - bubble.getHeight()) {
-				bubble.setY(480 - bubble.getHeight());
+			if (bubble.y > WORLD_HEIGHT - bubble.height) {
+				bubble.y = WORLD_HEIGHT - bubble.height;
 				bubble.flipYDirection();
-				bubble.ySpeed *= 0.98; // And lose some momentum
-			} else if (bubble.getY() < 0) {
-				bubble.setY(0);
+				bubble.yVelocity *= 0.98; // And lose some momentum
+			} else if (bubble.y < 0) {
+				bubble.y = 0;
 				bubble.flipYDirection();
 			}
 			
 			// Move the character
-			if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-				mCharacter.setX(mCharacter.getX() - 200 * Gdx.graphics.getDeltaTime());
-			} else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-				mCharacter.setX(mCharacter.getX() + 200 * Gdx.graphics.getDeltaTime());
+			if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.VOLUME_UP)) {
+				mCharacter.x -= (200 * deltaTime);
+			} else if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.VOLUME_DOWN)) {
+				mCharacter.x += (200 * deltaTime);
 			}
+			
+			// Spawn the rope
+			if (!mRopeVisible && (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.MENU))) {
+				mRopeVisible = true;
+				mRope.x = mCharacter.x + mCharacter.width/2 - mRope.width/2;
+				mRope.height = 0;
+				mRopeRegion.setRegionHeight(0);
+			}
+			
+			if (mRopeVisible) {
+				mRope.height += 100 * deltaTime;
+				mRopeRegion.setRegionHeight((int)mRope.height);
+			}
+			
+			if (mRope.height > WORLD_HEIGHT - mCharacter.height) {
+				clearRope();
+			}
+			
 			
 			// Prevent character from going off screen
-			if (mCharacter.getX() < 0) {
-				mCharacter.setX(0);
-			} else if (mCharacter.getX() > 800 - mCharacter.getWidth()) {
-				mCharacter.setX(800 - mCharacter.getWidth());
+			if (mCharacter.x < 0) {
+				mCharacter.x = 0;
+			} else if (mCharacter.x > WORLD_WIDTH - mCharacter.width) {
+				mCharacter.x = WORLD_WIDTH - mCharacter.width;
 			}
 			
-			
-			// Split when touched
-			if (Gdx.input.isTouched()) {
-				mTouchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-				mCamera.unproject(mTouchPos);
-				if (mTouchPos.x >= bubble.getX() && mTouchPos.x <= bubble.getX() + bubble.getWidth()
-				 && mTouchPos.y >= bubble.getY() && mTouchPos.y <= bubble.getY() + bubble.getHeight()) {
-					if (bubble.type == Bubble.Type.BIG || bubble.type == Bubble.Type.MEDIUM) {
-						for (int i = 0; i < 2; ++i) {
-							Bubble splitBubble = Bubble.newInstance(
-									bubble.type == Bubble.Type.BIG ? Bubble.Type.MEDIUM : Bubble.Type.SMALL);
-							splitBubble.setPosition(bubble.getX(), bubble.getY());
-							mBubbles.add(splitBubble);
-						}
+			// Split when overlapping
+			if (bubble.overlaps(mRope) && mRopeVisible) {
+				if (bubble.type == Bubble.Type.BIG || bubble.type == Bubble.Type.MEDIUM) {
+					for (int i = 0; i < 2; ++i) {
+						Bubble splitBubble = Bubble.newInstance(
+								bubble.type == Bubble.Type.BIG ? Bubble.Type.MEDIUM : Bubble.Type.SMALL);
+						splitBubble.x = bubble.x;
+						splitBubble.y = bubble.y;
+						mBubbles.add(splitBubble);
 					}
-					iter.remove();
 				}
+				clearRope();
+				iter.remove();
 			}
 		}
 		
@@ -141,9 +180,16 @@ public class SplitTheBubble implements ApplicationListener {
 		
 	}
 	
+	private void clearRope() {
+		mRopeVisible = false;
+		mRope.height = 0;
+		mRopeRegion.setRegionHeight(0);
+	}
+	
 	private void spawnBubble(Bubble.Type type, float x, float y) {
 		Bubble bubble = Bubble.newInstance(type);
-		bubble.setPosition(x, y);
+		bubble.x = x;
+		bubble.y = y;
 		mBubbles.add(bubble);
 		mLastBubbleSpawnTime = TimeUtils.nanoTime();
 	}
