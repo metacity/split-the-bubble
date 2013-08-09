@@ -27,7 +27,7 @@ public class Bubble extends Rectangle {
 		width = texture.getWidth();
 		height = texture.getHeight();
 		
-		xVelocity = (float)Math.random() * 4 - 2;
+		xVelocity = (float)Math.random() + 1;
 	}
 
 	public void flipYDirection() {
