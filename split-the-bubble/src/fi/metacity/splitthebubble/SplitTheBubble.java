@@ -57,7 +57,7 @@ public class SplitTheBubble implements ApplicationListener {
 		mRopeRegion = new TextureRegion(ropeTexture, ropeTexture.getWidth(), 0);
 		mRope = new Rectangle(
 				WORLD_WIDTH/2 - ropeTexture.getWidth()/2, // Center horizontally
-				mCharacterTexture.getHeight(),
+				0,
 				ropeTexture.getWidth(),
 				0
 				);
@@ -93,12 +93,42 @@ public class SplitTheBubble implements ApplicationListener {
 		}
 		mBatch.end();
 		
+		
+		// Move the character
+		if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.VOLUME_UP)) {
+			mCharacter.x -= (400 * deltaTime);
+		} else if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.VOLUME_DOWN)) {
+			mCharacter.x += (400 * deltaTime);
+		}
+		
+		// Spawn the rope
+		if (!mRopeVisible && (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.MENU) || Gdx.input.isTouched())) {
+			mRopeVisible = true;
+			mRope.x = mCharacter.x + mCharacter.width/2 - mRope.width/2;
+			mRope.height = 0;
+			mRopeRegion.setRegionHeight(0);
+		}
+		
+		if (mRopeVisible) {
+			mRope.height += 400 * deltaTime;
+			mRopeRegion.setRegionHeight((int)mRope.height);
+		}
+		
+		if (mRope.height > WORLD_HEIGHT) {
+			clearRope();
+		}
+		
+		// Prevent character from going off screen
+		if (mCharacter.x < 0) {
+			mCharacter.x = 0;
+		} else if (mCharacter.x > WORLD_WIDTH - mCharacter.width) {
+			mCharacter.x = WORLD_WIDTH - mCharacter.width;
+		}
+		
+		// Process bubbles
 		Iterator<Bubble> iter = mBubbles.iterator();
 		while (iter.hasNext()) {
 			Bubble bubble = iter.next();
-			
-			// Apply air resistance to X
-			bubble.xVelocity *= 0.999;
 			
 			// Apply gravity to Y
 			bubble.yVelocity -= (4 * deltaTime);
@@ -123,39 +153,9 @@ public class SplitTheBubble implements ApplicationListener {
 				bubble.yVelocity *= 0.98; // And lose some momentum
 			} else if (bubble.y < 0) {
 				bubble.y = 0;
+				// Apply ground friction to X
+				bubble.xVelocity *= 0.999;
 				bubble.flipYDirection();
-			}
-			
-			// Move the character
-			if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.VOLUME_UP)) {
-				mCharacter.x -= (200 * deltaTime);
-			} else if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.VOLUME_DOWN)) {
-				mCharacter.x += (200 * deltaTime);
-			}
-			
-			// Spawn the rope
-			if (!mRopeVisible && (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.MENU))) {
-				mRopeVisible = true;
-				mRope.x = mCharacter.x + mCharacter.width/2 - mRope.width/2;
-				mRope.height = 0;
-				mRopeRegion.setRegionHeight(0);
-			}
-			
-			if (mRopeVisible) {
-				mRope.height += 100 * deltaTime;
-				mRopeRegion.setRegionHeight((int)mRope.height);
-			}
-			
-			if (mRope.height > WORLD_HEIGHT - mCharacter.height) {
-				clearRope();
-			}
-			
-			
-			// Prevent character from going off screen
-			if (mCharacter.x < 0) {
-				mCharacter.x = 0;
-			} else if (mCharacter.x > WORLD_WIDTH - mCharacter.width) {
-				mCharacter.x = WORLD_WIDTH - mCharacter.width;
 			}
 			
 			// Split when overlapping
