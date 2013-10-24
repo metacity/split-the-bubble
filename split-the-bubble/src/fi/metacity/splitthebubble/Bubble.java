@@ -1,73 +1,57 @@
 package fi.metacity.splitthebubble;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Pool.Poolable;
 
 @SuppressWarnings("serial")
-public class Bubble extends Rectangle {
-	
-	private static Texture sBubbleBig;
-	private static Texture sBubbleMed;
-	private static Texture sBubbleSmall;
+public class Bubble extends Circle implements Poolable {
 
+	Bubble.Type type;
+	final Vector2 velocity;
 	
-	private final Texture mTexture;
+	boolean alive;
 	
-	public final Bubble.Type type;
-	public float yVelocity = 2.5f;
-	public float xVelocity;
-	
-	private Bubble(Texture texture, Bubble.Type type) {
+	public Bubble() {
 		super();
-		mTexture = texture;
+		
+		this.velocity = new Vector2((float)Math.random() + 0.75f, 2.5f);
+		this.alive = false;
+	}
+	
+	public void init(Bubble.Type type, float radius, float x, float y) {
+		super.radius = radius;
 		this.type = type;
+		this.x = x;
+		this.y = y;
 		
-		width = texture.getWidth();
-		height = texture.getHeight();
-		
-		xVelocity = (float)Math.random() + 1;
+		alive = true;
 	}
-
-	public void flipYDirection() {
-		yVelocity *= -1;
-	}
-
+	
 	public void flipXDirection() {
-		xVelocity *= -1;
+		velocity.x *= -1;
 	}
 	
-	public void draw(SpriteBatch batch) {
-		batch.draw(mTexture, x, y);
+	public void flipYDirection() {
+		velocity.y *= -1;
 	}
 	
-	public static Bubble newInstance(Bubble.Type type) {
-		switch (type) {
-			case BIG:
-				return new Bubble(sBubbleBig, Bubble.Type.BIG);
-				
-			case MEDIUM:
-				return new Bubble(sBubbleMed, Bubble.Type.MEDIUM);
-				
-			case SMALL:
-				return new Bubble(sBubbleSmall, Bubble.Type.SMALL);
-				
-			default:
-				throw new IllegalArgumentException("Invalid type");
-		}
+	public void update(float delta) {
+		// Apply gravity
+		velocity.y -= (4 * delta);
+		
+		// Move the bubble
+		x += velocity.x * 200 * delta;
+		y += velocity.y * 200 * delta;;
 	}
 	
-	public static void loadAssets() {
-		sBubbleBig = new Texture(Gdx.files.internal("bubble_big.png"));
-		sBubbleMed = new Texture(Gdx.files.internal("bubble_med.png"));
-		sBubbleSmall = new Texture(Gdx.files.internal("bubble_small.png"));
-	}
-	
-	public static void dispose() {
-		sBubbleBig.dispose();
-		sBubbleMed.dispose();
-		sBubbleSmall.dispose();
+	@Override
+	public void reset() {
+		type = null;
+		x = 0;
+		y = 0;
+		radius = 0;
+		alive = false;
 	}
 	
 	public static enum Type {
