@@ -65,7 +65,7 @@ public abstract class Bubble extends Circle implements Poolable {
 	}
 	
 	private void randomizeVelocity() {
-		velocity.set((float)Math.random()/2 + 1, (float)Math.random()/2 + 2);
+		velocity.set((float)Math.random()/2 + 1, (float)Math.random()/4 + 2.25f);
 		if (Math.random() > 0.5) {
 			velocity.x *= -1;
 		}
