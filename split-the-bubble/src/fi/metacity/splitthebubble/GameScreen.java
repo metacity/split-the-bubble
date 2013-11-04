@@ -2,14 +2,16 @@ package fi.metacity.splitthebubble;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class GameScreen implements Screen {
-	
 	final SplitTheBubble game;
 	final World world;
 	final WorldRenderer renderer;
+	
+	final FPSLogger fpslogger = new FPSLogger();
 	
 	public GameScreen(SplitTheBubble game) {
 		this.game = game;
@@ -37,6 +39,7 @@ public class GameScreen implements Screen {
 	public void render(float delta) {
 		update(delta);
 		draw();
+		fpslogger.log();
 	}
 
 	@Override
