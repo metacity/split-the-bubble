@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class World {
 	static final int WORLD_WIDTH = 800;
 	static final int WORLD_HEIGHT = 480;
-	static final float GRAVITY = 4;
+	static final float GRAVITY = 3;
 	static final long BUBBLE_SPAWN_INTERVAL_NS = 12500000000L; 
 	
 	final Bob bob;
