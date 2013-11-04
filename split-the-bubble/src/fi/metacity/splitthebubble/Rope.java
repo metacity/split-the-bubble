@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 @SuppressWarnings("serial")
 public class Rope extends Rectangle {
 	static final float WIDTH = 18;
-	static final int MOVEMENT_PER_SECOND = 400;
+	static final int MOVEMENT_PER_SECOND = 500;
 	
 	final Bob bob;
 	boolean isVisible = false;
