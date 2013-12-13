@@ -3,44 +3,37 @@ texturepack.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-background
-  rotate: false
-  xy: 1, 197
-  size: 1280, 720
-  orig: 1280, 720
-  offset: 0, 0
-  index: -1
 rope
   rotate: false
-  xy: 1283, 437
+  xy: 1, 1
   size: 18, 480
   orig: 18, 480
   offset: 0, 0
   index: -1
 bubble_big
   rotate: false
-  xy: 1, 67
+  xy: 21, 353
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 bob
   rotate: false
-  xy: 1303, 817
+  xy: 21, 251
   size: 50, 100
   orig: 50, 100
   offset: 0, 0
   index: -1
 bubble_med
   rotate: false
-  xy: 1, 1
+  xy: 151, 417
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 bubble_small
   rotate: false
-  xy: 131, 171
+  xy: 21, 225
   size: 24, 24
   orig: 24, 24
   offset: 0, 0

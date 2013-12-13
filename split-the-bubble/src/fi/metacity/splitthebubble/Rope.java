@@ -13,7 +13,7 @@ public class Rope extends Rectangle {
 	boolean isVisible = false;
 	
 	public Rope(Bob bob) {
-		super(0, bob.y, WIDTH, 0); // Only the width is relevant, position is relative to Bob's position
+		super(0, bob.y, WIDTH, 0);
 		this.bob = bob;
 	}
 
@@ -29,7 +29,7 @@ public class Rope extends Rectangle {
 	}
 	
 	public void trySpawning() {
-		if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.MENU) || Gdx.input.isTouched()) {
+		if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched()) {
 			isVisible = true;
 			x = bob.x + bob.width/2 - width/2;
 			height = 0;

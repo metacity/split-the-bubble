@@ -14,8 +14,6 @@ public class Main {
 		cfg.height = 720;
 		
 		Settings settings = new Settings();
-		settings.maxHeight = 2048;
-		settings.maxWidth = 2048;
 //        settings.maxWidth = 512;
 //        settings.maxHeight = 512;
         TexturePacker2.process(settings, "../images", "../split-the-bubble-android/assets", "texturepack");

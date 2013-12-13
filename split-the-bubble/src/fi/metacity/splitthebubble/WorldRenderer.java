@@ -24,7 +24,7 @@ public class WorldRenderer {
 		batch.begin();
 		renderBackground();
 		renderObjects();
-		Assets.font.draw(batch, "Score: " + world.score, 20, World.WORLD_HEIGHT - 20);
+		Assets.font.draw(batch, "Score: " + world.score, 15, World.WORLD_HEIGHT - 15);
 		batch.end();
 	}
 	
@@ -35,8 +35,8 @@ public class WorldRenderer {
 	
 	private void renderObjects() {
 		batch.enableBlending();
-		renderRope();
 		renderBob();
+		renderRopes();
 		renderBubbles();
 	}
 	
@@ -58,7 +58,11 @@ public class WorldRenderer {
 		}
 	}
 	
-	private void renderRope() {
-		batch.draw(Assets.rope, world.rope.x, world.rope.y, world.rope.width, world.rope.height);
+	private void renderRopes() {
+		for (int i = 0; i < world.bob.ropes.size; ++i) {
+			Rope rope = world.bob.ropes.get(i);
+			batch.draw(Assets.rope, rope.x, rope.y, rope.width, rope.height);
+		}
+		
 	}
 }

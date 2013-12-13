@@ -14,39 +14,40 @@ public class World {
 	
 	final Bob bob;
 	final Array<Bubble> activeBubbles;
-	final Rope rope;
 	
 	int score = 0;
 	long lastBubbleSpawnTime;
 	
 	public World() {
 		bob = new Bob(World.WORLD_WIDTH / 2, 60);
-		rope = new Rope(bob);
 		activeBubbles = new Array<Bubble>(false, 16);
 	}
 	
 	public void update(float delta) {
 		bob.update(delta);
-		rope.update(delta);
 		
 		// Process bubbles
 		Iterator<Bubble> iter = activeBubbles.iterator();
 		while (iter.hasNext()) {
 			Bubble bubble = iter.next();
 			bubble.update(delta);
-			// Split when overlapping
-			if (rope.isVisible && Intersector.overlapCircleRectangle(bubble, rope)) {
-				for (int i = 0; i < 2; ++i) { // 2 bubbles per split
-					Bubble splitBubble = bubble.getSplitBubble(bubble.x, bubble.y);
-					if (splitBubble != null) {
-						activeBubbles.add(splitBubble);
+			// Split when overlapping with a rope
+			for (int i = 0; i < bob.ropes.size; ++i) {
+				Rope rope = bob.ropes.get(i);
+				if (rope.isVisible && Intersector.overlaps(bubble, rope)) {
+					for (int j = 0; j < 2; ++j) { // 2 bubbles per split
+						Bubble splitBubble = bubble.getSplitBubble(bubble.x, bubble.y);
+						if (splitBubble != null) {
+							activeBubbles.add(splitBubble);
+						}
 					}
+					score++;
+					rope.clear();
+					iter.remove();
+					bubble.free();
 				}
-				score++;
-				rope.clear();
-				iter.remove();
-				bubble.free();
 			}
+				
 		}
 		
 		if (TimeUtils.nanoTime() - lastBubbleSpawnTime > BUBBLE_SPAWN_INTERVAL_NS) {
