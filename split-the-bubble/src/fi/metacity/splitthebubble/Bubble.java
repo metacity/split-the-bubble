@@ -56,8 +56,8 @@ public abstract class Bubble extends Circle implements Poolable {
 			y = World.WORLD_HEIGHT - radius;
 			flipYDirection();
 			velocity.y *= 0.98; // And lose some momentum
-		} else if (y - radius < 0) {
-			y = radius;
+		} else if (y - radius < 60) {
+			y = radius + 60;
 			// Apply ground friction to X
 			velocity.x *= 0.999;
 			flipYDirection();

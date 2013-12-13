@@ -10,10 +10,12 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "Split the Bubble";
 		cfg.useGL20 = false;
-		cfg.width = 800;
-		cfg.height = 480;
+		cfg.width = 1280;
+		cfg.height = 720;
 		
 		Settings settings = new Settings();
+		settings.maxHeight = 2048;
+		settings.maxWidth = 2048;
 //        settings.maxWidth = 512;
 //        settings.maxHeight = 512;
         TexturePacker2.process(settings, "../images", "../split-the-bubble-android/assets", "texturepack");

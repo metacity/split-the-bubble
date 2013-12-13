@@ -7,8 +7,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class World {
-	static final int WORLD_WIDTH = 800;
-	static final int WORLD_HEIGHT = 480;
+	static final int WORLD_WIDTH = 1280;
+	static final int WORLD_HEIGHT = 720;
 	static final float GRAVITY = 3;
 	static final long BUBBLE_SPAWN_INTERVAL_NS = 12500000000L; 
 	
@@ -20,7 +20,7 @@ public class World {
 	long lastBubbleSpawnTime;
 	
 	public World() {
-		bob = new Bob(World.WORLD_WIDTH / 2, 0);
+		bob = new Bob(World.WORLD_WIDTH / 2, 60);
 		rope = new Rope(bob);
 		activeBubbles = new Array<Bubble>(false, 16);
 	}

@@ -13,7 +13,7 @@ public class Rope extends Rectangle {
 	boolean isVisible = false;
 	
 	public Rope(Bob bob) {
-		super(0, 0, WIDTH, 0); // Only the width is relevant, position is relative to Bob's position
+		super(0, bob.y, WIDTH, 0); // Only the width is relevant, position is relative to Bob's position
 		this.bob = bob;
 	}
 

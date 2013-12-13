@@ -2,6 +2,7 @@ package fi.metacity.splitthebubble;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class WorldRenderer {
 	
@@ -40,6 +41,12 @@ public class WorldRenderer {
 	}
 	
 	private void renderBob() {
+		TextureRegion bobTexture = Assets.bob;
+		// Flip texture if direction changed
+		if ((world.bob.facingLeft && !bobTexture.isFlipX()) ||
+			(!world.bob.facingLeft && bobTexture.isFlipX())) {
+			bobTexture.flip(true, false);
+		}
 		batch.draw(Assets.bob, world.bob.x, world.bob.y);
 	}
 	

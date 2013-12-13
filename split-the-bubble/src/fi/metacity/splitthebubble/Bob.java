@@ -7,9 +7,11 @@ import com.badlogic.gdx.math.Rectangle;
 
 @SuppressWarnings("serial")
 public class Bob extends Rectangle {
-	static final float WIDTH = 80;
-	static final float HEIGHT = 80;
+	static final float WIDTH = 50;
+	static final float HEIGHT = 100;
 	static final int MOVEMENT_PER_SECOND = 400;
+	
+	boolean facingLeft;
 
 	public Bob(float x, float y) {
 		super(x - WIDTH/2, y, WIDTH, HEIGHT);
@@ -25,6 +27,7 @@ public class Bob extends Rectangle {
 		} else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
 			movementPerSecond = MOVEMENT_PER_SECOND;
 		}
+		facingLeft = (movementPerSecond < 0);
 		x += (movementPerSecond * delta);
 
 		preventOffscreen();	

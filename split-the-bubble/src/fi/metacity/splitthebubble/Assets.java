@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Assets {
-	static final int WORLD_WIDTH = 800;
-	static final int WORLD_HEIGHT = 480;
 	
 	static TextureAtlas atlas;
 	
